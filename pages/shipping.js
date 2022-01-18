@@ -7,58 +7,59 @@ import {
     Link,
   } from '@material-ui/core'; 
   import { useRouter } from 'next/router';
-  import NextLink from 'next/link';
   import React, { useContext, useEffect } from 'react';
   import Layout from '../components/Layout';
   import { Store } from '../utils/Store';
   import useStyles from '../utils/styles';
   import Cookies from 'js-cookie';
   import { Controller, useForm } from 'react-hook-form';
-  import CheckoutWizard from '../components/checkoutWizard';
+  import CheckoutWizard from '../components/CheckoutWizard';
   
 //   import { getError } from '../utils/error';
   
   export default function Shipping() {
     const {
-      handleSubmit,
-      control,
-      formState: { errors },
-      setValue
+        handleSubmit,
+        control,
+        formState: { errors },
+        setValue,
     } = useForm();
     const router = useRouter();
-    const { redirect } = router.query;
+    // const { redirect } = router.query;
     const { state, dispatch } = useContext(Store);
-    const { userInfo, cart:{ shippingAddress }, } = state;
-    useEffect(() => {
-      if (!userInfo) {
-        router.push('/login?redirect=/shipping');
-      }
-      setValue('fullName', shippingAddress.fullName);
-      setValue('address', shippingAddress.address);
-      setValue('city', shippingAddress.city);
-      setValue('postalCode', shippingAddress.postalCode);
-      setValue('counrty', shippingAddress.counrty);
-    }, []);
+    const {
+        userInfo,
+        cart: { shippingAddress },
+      } = state;
+      useEffect(() => {
+        if (!userInfo) {
+          router.push('/login?redirect=/shipping');
+        }
+        setValue('fullName', shippingAddress.fullName);
+        setValue('address', shippingAddress.address);
+        setValue('city', shippingAddress.city);
+        setValue('postalCode', shippingAddress.postalCode);
+        setValue('country', shippingAddress.country);
+      }, []);
   
-    const classes = useStyles();
-    const submitHandler = ({ fullName, address, city, postalCode, counrty }) => {
-      
-        dispatch({ 
-            type: 'SAVE_SHIPPING_ADDRESS', 
-            payload: { fullName,  address, city, postalCode, counrty } 
+      const classes = useStyles();
+      const submitHandler = ({ fullName, address, city, postalCode, country }) => {
+        dispatch({
+          type: 'SAVE_SHIPPING_ADDRESS',
+          payload: { fullName, address, city, postalCode, country },
         });
-        Cookies.set('shippingAddress', { 
-            fullName,  
-            address, 
-            city, 
-            postalCode, 
-            counrty 
-        });
+        Cookies.set('shippingAddress', JSON.stringify({
+          fullName,
+          address,
+          city,
+          postalCode,
+          country,
+        }));
         router.push('/payment');
      
     };
     return (
-      <Layout title="Shipping">
+      <Layout title="Shipping Address">
         <CheckoutWizard ativeStep={1} />
         <form onSubmit={handleSubmit(submitHandler)} className={classes.form}>
           <Typography component="h1" variant="h1">
@@ -179,7 +180,7 @@ import {
             </ListItem>
             <ListItem>
               <Controller
-                name="counrty"
+                name="country"
                 control={control}
                 defaultValue=""
                 rules={{
@@ -190,14 +191,14 @@ import {
                   <TextField
                     variant="outlined"
                     fullWidth
-                    id="counrty"
-                    label="Counrty"
-                    error={Boolean(errors.counrty)}
+                    id="country"
+                    label="Country"
+                    error={Boolean(errors.country)}
                     helperText={
-                      errors.counrty
-                        ? errors.counrty.type === 'minLength'
-                          ? 'Counrty should not be less than 3'
-                          : 'Counrty is required'
+                      errors.country
+                        ? errors.country.type === 'minLength'
+                          ? 'Country should not be less than 3'
+                          : 'Country is required'
                         : ''
                     }
                     {...field}
